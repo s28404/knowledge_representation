@@ -26,17 +26,37 @@ class Encoder(Model):
         self.flatten = layers.Flatten()  # (4x4x128) -> (2048)
         self.dense = layers.Dense(latent_dim)  # (2048) -> (latent_dim)
 
-    def call(self, x):
+    def build(self, input_shape):
+        super(Encoder, self).build(input_shape)
+
+        self.conv1.build(input_shape)
+        self.bn1.build(self.conv1.compute_output_shape(input_shape))
+
+        shape_after_conv1 = self.conv1.compute_output_shape(input_shape)
+        self.conv2.build(shape_after_conv1)
+        self.bn2.build(self.conv2.compute_output_shape(shape_after_conv1))
+
+        shape_after_conv2 = self.conv2.compute_output_shape(shape_after_conv1)
+        self.conv3.build(shape_after_conv2)
+        self.bn3.build(self.conv3.compute_output_shape(shape_after_conv2))
+
+        shape_after_conv3 = self.conv3.compute_output_shape(shape_after_conv2)
+        self.flatten.build(shape_after_conv3)
+        self.dense.build(self.flatten.compute_output_shape(shape_after_conv3))
+
+        self.built = True
+
+    def call(self, x, training=None):
         x = self.conv1(x)
-        x = self.bn1(x)
+        x = self.bn1(x, training=training)
         x = tf.nn.relu(x)
 
         x = self.conv2(x)
-        x = self.bn2(x)
+        x = self.bn2(x, training=training)
         x = tf.nn.relu(x)
 
         x = self.conv3(x)
-        x = self.bn3(x)
+        x = self.bn3(x, training=training)
         x = tf.nn.relu(x)
 
         x = self.flatten(x)
@@ -73,20 +93,45 @@ class Decoder(Model):
             3, kernel_size=3, padding="same", activation="tanh"
         )  # (32x32x32) -> (32x32x3)
 
-    def call(self, x):
+    def build(self, input_shape): 
+        super(Decoder, self).build(input_shape)
+
+        # Build layers sequentially with proper shape propagation
+        self.dense.build(input_shape)
+        shape_after_dense = self.dense.compute_output_shape(input_shape)
+        self.reshape.build(shape_after_dense)
+
+        shape_after_reshape = self.reshape.compute_output_shape(shape_after_dense)
+        self.deconv1.build(shape_after_reshape)
+        self.bn1.build(self.deconv1.compute_output_shape(shape_after_reshape))
+
+        shape_after_deconv1 = self.deconv1.compute_output_shape(shape_after_reshape)
+        self.deconv2.build(shape_after_deconv1)
+        self.bn2.build(self.deconv2.compute_output_shape(shape_after_deconv1))
+
+        shape_after_deconv2 = self.deconv2.compute_output_shape(shape_after_deconv1)
+        self.deconv3.build(shape_after_deconv2)
+        self.bn3.build(self.deconv3.compute_output_shape(shape_after_deconv2))
+
+        shape_after_deconv3 = self.deconv3.compute_output_shape(shape_after_deconv2)
+        self.output_layer.build(shape_after_deconv3)
+
+        self.built = True
+
+    def call(self, x, training=None):
         x = self.dense(x)
         x = self.reshape(x)
 
         x = self.deconv1(x)
-        x = self.bn1(x)
+        x = self.bn1(x, training=training)
         x = tf.nn.relu(x)
 
         x = self.deconv2(x)
-        x = self.bn2(x)
+        x = self.bn2(x, training=training)
         x = tf.nn.relu(x)
 
         x = self.deconv3(x)
-        x = self.bn3(x)
+        x = self.bn3(x, training=training)
         x = tf.nn.relu(x)
 
         x = self.output_layer(x)
@@ -97,10 +142,24 @@ class Decoder(Model):
 class Autoencoder(Model):
     def __init__(self, input_dim, latent_dim):
         super(Autoencoder, self).__init__()
+        self.input_dim = input_dim
+        self.latent_dim = latent_dim
         self.encoder = Encoder(input_dim, latent_dim)
         self.decoder = Decoder(latent_dim, input_dim)
 
-    def call(self, x):
-        z = self.encoder(x)
-        reconstructed = self.decoder(z)
+    def build(self, input_shape):
+        super(Autoencoder, self).build(input_shape)
+
+        # Build encoder with input shape
+        self.encoder.build(input_shape)
+
+        # Build decoder with latent shape
+        latent_shape = (input_shape[0], self.latent_dim)
+        self.decoder.build(latent_shape)
+
+        self.built = True # Mark the model as built
+
+    def call(self, x, training=None):
+        z = self.encoder(x, training=training)
+        reconstructed = self.decoder(z, training=training)
         return reconstructed

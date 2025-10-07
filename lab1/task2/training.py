@@ -13,6 +13,7 @@ class Trainer:
         checkpoint_interval,
         checkpoint_dir,
         recon_log_interval,
+        seed,
     ):
         self.model = model
         self.train_loader = train_loader
@@ -22,6 +23,8 @@ class Trainer:
         self.checkpoint_interval = checkpoint_interval
         self.checkpoint_dir = checkpoint_dir
         self.recon_log_interval = recon_log_interval
+        self.seed = seed
+
 
     @tf.function
     def train_step(self, x):
@@ -56,7 +59,7 @@ class Trainer:
             current_lr = float(tf.convert_to_tensor(lr_attr))
             
             print(
-                f"Epoch {epoch + 1}, Avg Loss: {metrics['avg_loss'].numpy():.4f}, Learning Rate: {current_lr:.6f}"
+                f"Epoch: {epoch + 1}, Avg Loss: {metrics['avg_loss'].numpy():.4f}, LR: {current_lr:.6f}, Seed: {self.seed}"
             )
             wandb.log(
                 {
