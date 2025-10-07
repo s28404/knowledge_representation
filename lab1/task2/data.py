@@ -41,8 +41,7 @@ def load_data(batch_size):
     }
     train_set = pd.read_parquet("hf://datasets/uoft-cs/cifar10/" + splits["train"])
     test_set = pd.read_parquet("hf://datasets/uoft-cs/cifar10/" + splits["test"])
-    print(train_set)
-
+ 
     # numpy stack to convert list of arrays to single array
     x_train = np.stack(train_set["img"].apply(decode_image_dict))
     x_test = np.stack(test_set["img"].apply(decode_image_dict))
@@ -59,9 +58,9 @@ def load_data(batch_size):
 
     test_loader = (
         tf.data.Dataset.from_tensor_slices(x_test)  # (10000, 32, 32, 3)
-        .map(lambda x: test_transform(x), num_parallel_calls=tf.data.AUTOTUNE)
+        .map(lambda x: test_transform(x), num_parallel_calls=tf.data.AUTOTUNE) # automatically determines optimal number of parallel threads (like pytorch num_workers)
         .batch(batch_size=batch_size)
-        .prefetch(buffer_size=tf.data.AUTOTUNE)
+        .prefetch(buffer_size=tf.data.AUTOTUNE) # overlaps data loading with training (like pytorch pin_memory=True)
     )
 
     return train_loader, test_loader

@@ -1,0 +1,7 @@
+# folders
+wandb/
+__pycache__/
+checkpoints/
+
+*.swo
+*.swp

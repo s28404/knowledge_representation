@@ -1,0 +1,26 @@
+{
+  "timestamp": "2025-10-07 10:13:33",
+  "user": "kajetan",
+  "host": "Kajetandell",
+  "framework": "TensorFlow",
+  "tf_version": "2.21.0-dev20250925",
+  "device": "/physical_device:GPU:0",
+  "seed": 3042000809,
+  "model_parameters": {
+    "total_params": 862211,
+    "trainable_params": 861315,
+    "non_trainable_params": 896
+  },
+  "config": {
+    "batch_size": 64,
+    "latent_dim": 128,
+    "learning_rate": 0.001,
+    "epochs": 100,
+    "alpha": 0.01,
+    "max_to_keep": 5,
+    "checkpoint_interval": 5,
+    "recon_log_interval": 10,
+    "checkpoint_dir": "./checkpoints",
+    "project_name": "cifar10-autoencoder"
+  }
+}
