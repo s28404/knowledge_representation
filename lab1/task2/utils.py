@@ -8,8 +8,6 @@ import os
 import json
 import numpy as np
 import tensorflow as tf
-import getpass
-import socket
 from datetime import datetime
 
 
@@ -91,22 +89,15 @@ def save_metadata(model, config, seed, metadata_dir="metadata"):
     total_params = trainable_params + non_trainable_params
 
     metadata = {
-        "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-        "user": getpass.getuser(),
-        "host": socket.gethostname(),
-        "framework": "TensorFlow",
-        "tf_version": tf.__version__,
-        "device": tf.config.list_physical_devices("GPU")[0].name
-        if tf.config.list_physical_devices("GPU")
-        else "CPU",
-        "seed": seed,
-        "model_parameters": {
-            "total_params": total_params,
-            "trainable_params": trainable_params,
-            "non_trainable_params": non_trainable_params,
-        },
-        "config": config,
-    }
+    "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+    "seed": seed,
+    "model_parameters": {
+        "total_params": total_params,
+        "trainable_params": trainable_params,
+        "non_trainable_params": non_trainable_params,
+    },
+    "config": config,
+}
 
     path = os.path.join(metadata_dir, f"metadata_seed_{seed}.json")
     with open(path, "w") as f:
