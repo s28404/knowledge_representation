@@ -1,6 +1,7 @@
 import tensorflow as tf
 import argparse
 
+@tf.function
 def rotate(x, y, theta):
     x_hat = x * tf.cos(theta) - y * tf.sin(theta)
     y_hat = x * tf.sin(theta) + y * tf.cos(theta)

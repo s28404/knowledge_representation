@@ -16,14 +16,20 @@ def main():
 
     # Rotate by 45 degrees
     theta = np.pi / 4
-
+    
     R = tf.stack([
         [tf.cos(theta), -tf.sin(theta)],
         [tf.sin(theta), tf.cos(theta)]
     ])
-
+    
+    # point.shape: (2, 1)
     point = tf.reshape(tf.constant([x, y]), (2, 1))
+    print("Original point vector:")
+    print(point.numpy())
+    # point.shape (2, 1) * R.shape (2, 2) = (2, 1)
     rotated_point = tf.matmul(R, point)
+    print("Rotated point vector:")
+    print(rotated_point.numpy())
 
     original_x, original_y = point[0, 0], point[1, 0]
     rotated_x, rotated_y = rotated_point[0, 0], rotated_point[1, 0]
