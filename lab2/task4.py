@@ -1,16 +1,18 @@
 import tensorflow as tf
 import argparse
 
+@tf.function
 def solve_linear_system(A, b):
     x = tf.linalg.solve(A, b)
     return tf.round(x * 1000) / 1000  # Round to 3 decimal places
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--A', type=str, default='2,1,1;1,3,2;1,0,0', help='Matrix A as a comma-separated string of rows; each row is a semicolon-separated string')
-    parser.add_argument('--b', type=str, default='4,5,6', help='Vector b as a comma-separated string')
+    parser.add_argument('--A', type=str, default='1,1,1;1,1,1;1,1,1', help='Matrix A as a comma-separated string of rows; each row is a semicolon-separated string')
+    parser.add_argument('--b', type=str, default='1,1,1', help='Vector b as a comma-separated string')
     args = parser.parse_args()
 
+    # A.shape: (n, n), b.shape: (n, 1)
     A = tf.constant([[float(num) for num in row.split(',')] for row in args.A.split(';')], dtype=tf.float32)
     b = tf.constant([[float(num)] for num in args.b.split(',')], dtype=tf.float32)
 
