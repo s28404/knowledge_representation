@@ -160,30 +160,3 @@ def evaluate_own_photo(model, image_path):
 
     print(f"Predicted Label: {labels[predicted_label]}, Confidence: {confidence:.4f}")
 
-
-def extract_weights_to_h5(model_type="dense"):
-    import tensorflow as tf
-    import os
-
-    keras_path = f"models/{model_type}_fashion_mnist_model.keras"
-    h5_path = f"models/{model_type}_fashion_mnist_model.weights.h5"
-
-    if not os.path.exists(keras_path):
-        print(f"Error: Model file {keras_path} not found!")
-        return
-
-    model = tf.keras.models.load_model(keras_path)
-
-    # Save weights to h5
-    model.save_weights(h5_path)
-    print(f"Weights extracted to {h5_path}")
-
-    # Also save as another format (SavedModel)
-    saved_model_path = f"models/{model_type}_fashion_mnist_saved_model"
-    model.export(saved_model_path)
-    print(f"Model exported to {saved_model_path}")
-
-
-if __name__ == "__main__":
-    extract_weights_to_h5("dense")
-    extract_weights_to_h5("cnn")
