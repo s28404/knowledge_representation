@@ -26,8 +26,10 @@ def main():
     args = parser.parse_args()
 
     if args.own_photo:
+        # On my local laptop I uses tensorflow 2.21.0-dev20250925 with which I saved the model
+        # but on the server tensorflow 2.12.0 is installed, so I need to load the model differently
         model = tf.keras.models.load_model(
-            f"models/{args.model_type}_fashion_mnist_model.keras"
+            f"models/{args.model_type}_fashion_mnist_model.h5"
         )
         evaluate_own_photo(model, args.own_photo)
         return
