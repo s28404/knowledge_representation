@@ -36,42 +36,24 @@ def predict(
     n_steps=10,
     output_file="predictions.csv",
 ):
-    """Make predictions using trained model."""
-
     processor_path = os.path.join(model_dir, "processor.pkl")
-    try:
-        with open(processor_path, "rb") as f:
-            processor = pickle.load(f)
-    except FileNotFoundError:
-        print(
-            f"Error: {processor_path} not found. Train first with: python train.py --data <file>"
-        )
-        return
+    with open(processor_path, "rb") as f:
+        processor = pickle.load(f)
 
-    model_filename = f"{model_type}_model.keras"
-    model_path = os.path.join(model_dir, model_filename)
+    model_path = os.path.join(model_dir, f"{model_type}_model.keras")
+    model = tf.keras.models.load_model(model_path)
 
-    try:
-        model = tf.keras.models.load_model(model_path)
-    except FileNotFoundError:
-        print(
-            f"Error: {model_path} not found. Train first with: python train.py --data <file>"
-        )
-        return
-
-    try:
-        data = processor.load_csv(history_file)
-    except FileNotFoundError:
-        print(f"Error: {history_file} not found")
-        return
-
+    data = processor.load_csv(history_file)
     data_enhanced = processor.add_harmonics(data, period=24)
     last_sequence = processor.get_last_sequence(data_enhanced)
 
     print(f"Forecasting {n_steps} steps with {model_type.upper()}...")
+    # predictions_normalized shape is (n_steps,)
     predictions_normalized = make_predictions(model, last_sequence, n_steps)
+    # predictions_original_scale shape is (n_steps,), we restore original scale from normalized scale
     predictions_original_scale = processor.inverse_transform(predictions_normalized)
 
+    # results_df shape is (n_steps, 2) with columns "step" and "prediction" where predictions are in original scale
     results_df = pd.DataFrame(
         {"step": np.arange(1, n_steps + 1), "prediction": predictions_original_scale}
     )

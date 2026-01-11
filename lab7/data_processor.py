@@ -4,6 +4,7 @@ from sklearn.preprocessing import MinMaxScaler
 
 
 class DataProcessor:
+    # Processor is a class to handle data loading, preprocessing, and sequence creation
     # lookback_window: number of past time steps to consider for each input sequence
     # scale: whether to apply Min-Max scaling to the data
     # MinMaxScaler scales each feature to a given range, default is (0, 1) from (min, max)
