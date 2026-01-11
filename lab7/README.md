@@ -1,0 +1,3 @@
+Jak widzimy model LSTM i dense są przetrenowane ponieważ trening loss jest znacznie mniejszy niż walidacyjny.
+
+Widzimy jednak, że dense model radzi sobie lepiej z danymi testowymi niż LSTM. Może to wynikać z faktu, że dane są generowane z prostą funkcją sinusoidalną, która może być łatwiej modelowana przez warstwy gęste niż przez LSTM, które są bardziej skomplikowane i mogą być bardziej podatne na przeuczenie się na małych zbiorach danych.
